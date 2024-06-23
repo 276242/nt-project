@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/loans")
 @PostAuthorize("hasRole('ADMIN')")
@@ -32,12 +34,19 @@ public class LoanController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<GetLoanResponseDto>> getLoanByUserId(@PathVariable long userId) {
+        List<GetLoanResponseDto> dto = loanService.getLoansByUserId(userId);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+
     public ResponseEntity<GetLoansPageResponseDto> getAll(@RequestParam(required = false) Long userId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
 
         GetLoansPageResponseDto dto = loanService.getAll(userId, page, size);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {

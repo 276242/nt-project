@@ -54,6 +54,7 @@ public class BookService {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CreateBookResponseDto create(CreateBookDto book) {
         Optional<BookEntity> existingBook = bookRepository.findByIsbn(book.getIsbn());
 
@@ -84,6 +85,7 @@ public class BookService {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(long id) {
         if (!bookRepository.existsById(id)) {
             throw BookAlreadyExists.create(id);

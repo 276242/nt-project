@@ -9,6 +9,8 @@ public class CreateLoanDto {
     @NotNull
     private Date dueDate;
     @NotNull
+    private Date loanDate;
+    @NotNull
     private Long userId;
     @NotNull
     private Long bookId;
@@ -16,8 +18,9 @@ public class CreateLoanDto {
     public CreateLoanDto() {
     }
 
-    public CreateLoanDto(Date dueDate, Long userId, Long bookId) {
+    public CreateLoanDto(Date dueDate, Date loanDate, Long userId, Long bookId) {
         this.dueDate = dueDate;
+        this.loanDate = loanDate;
         this.userId = userId;
         this.bookId = bookId;
     }
@@ -44,5 +47,13 @@ public class CreateLoanDto {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Date getLoanDate() {
+        return loanDate;
+    }
+
+    public void setLoanDate(Date loanDate) {
+        this.loanDate = loanDate;
     }
 }

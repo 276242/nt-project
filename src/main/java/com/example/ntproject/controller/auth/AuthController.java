@@ -28,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<RegisterResponseDto> register (@Valid @RequestBody RegisterDto requestBody) {
         RegisterResponseDto dto = authService.register(requestBody);
         return new ResponseEntity<>(dto, HttpStatus.CREATED);

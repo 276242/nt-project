@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -51,17 +52,26 @@ public class LoanService extends OwnershipService {
         LoanEntity loan = new LoanEntity();
         loan.setUser(user);
         loan.setBook(book);
-        loan.setLoanDate(new Date(System.currentTimeMillis()));
+        loan.setLoanDate(loanDto.getLoanDate());
         loan.setDueDate(loanDto.getDueDate());
         loanRepository.save(loan);
 
-        return new CreateLoanResponseDto(loan.getId(), loan.getLoanDate(), loan.getDueDate(), loan.getUser().getId(), loan.getBook().getId());
+        return new CreateLoanResponseDto(loan.getId(), loan.getLoanDate(), loan.getDueDate(), new GetUserDto(user.getId(), user.getName(), user.getLastName(), user.getEmail()), new GetBookDto(book.getId(), book.getIsbn(), book.getTitle(), book.getAuthor(), book.getPublisher(), book.getPublicationYear(), book.getAvailableCopies() > 0));
     }
 
     @PostAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, returnObject.user.id)")
     public GetLoanResponseDto getOneById(long id) {
        LoanEntity loan = loanRepository.findById(id).orElseThrow(() -> LoanNotFound.create(id));
        return mapLoan(loan);
+    }
+
+    @PostAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, returnObject.user.id)")
+    public List<GetLoanResponseDto> getLoansByUserId(long userId) {
+        List<LoanEntity> loans = loanRepository.findByUserId(userId);
+        if (loans.isEmpty()) {
+            throw LoanNotFound.createByUserId(userId);
+        }
+        return loans.stream().map(this::mapLoan).collect(Collectors.toList());
     }
 
     @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #userId)")
@@ -109,4 +119,5 @@ public class LoanService extends OwnershipService {
 
         return new ReturnBookResponseDto(loan.getId(),loan.getLoanDate(), loan.getDueDate(), loan.getUser().getId(), loan.getBook().getId(), loan.getReturnDate());
     }
+
 }
